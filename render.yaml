@@ -2,9 +2,15 @@ services:
   - type: web
     name: puppeteer-api
     env: node
-    plan: free
+    region: oregon
     buildCommand: npm install
-    startCommand: npm start
+    startCommand: node scraper.js
+    plan: free
     envVars:
-      - key: NODE_ENV
-        value: production
+      - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
+        value: "true"
+      - key: CHROMIUM_PATH
+        value: "/usr/bin/chromium-browser"
+    build:
+      packages:
+        - chromium-browser
