@@ -20,6 +20,11 @@ const apiKeyAuth = (req, res, next) => {
     next();
 };
 
+// Root route for welcome message
+app.get('/', (req, res) => {
+    res.send('✅ Welcome to the Puppeteer Scraper API! Use /scrape or /healthz endpoints.');
+});
+
 // Scrape endpoint
 app.get('/scrape', apiKeyAuth, async (req, res) => {
     let { url } = req.query;
@@ -39,13 +44,9 @@ app.get('/scrape', apiKeyAuth, async (req, res) => {
 
     let browser;
     try {
-        // ✅ Runtime Chromium download
-        const browserFetcher = puppeteer.createBrowserFetcher();
-        const revisionInfo = await browserFetcher.download('121.0.6167.85'); // ensure Puppeteer version supports this
-
         browser = await puppeteer.launch({
             headless: 'new',
-            executablePath: revisionInfo.executablePath,
+            executablePath: process.env.CHROMIUM_PATH || undefined, // for Render
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
 
@@ -89,3 +90,4 @@ app.get('/scrape', apiKeyAuth, async (req, res) => {
 app.listen(PORT, () => {
     console.log(`API running at http://localhost:${PORT}`);
 });
+
