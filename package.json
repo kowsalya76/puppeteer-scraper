@@ -1,0 +1,13 @@
+{
+  "name": "puppeteer-scraper",
+  "version": "1.0.0",
+  "description": "Puppeteer crawler as an API",
+  "main": "scraper.js",
+  "scripts": {
+    "start": "node scraper.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "puppeteer": "^21.3.8"
+  }
+}
