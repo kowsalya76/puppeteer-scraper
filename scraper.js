@@ -4,8 +4,14 @@ const { URL } = require('url');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const SECRET_API_KEY = "mySuperSecretKey123";
+const SECRET_API_KEY = process.env.API_KEY || "mySuperSecretKey123"; // fallback for local
 
+// Health check route for Render
+app.get('/healthz', (req, res) => {
+    res.status(200).send('OK');
+});
+
+// API key authentication middleware
 const apiKeyAuth = (req, res, next) => {
     const providedKey = req.header('x-api-key');
     if (!providedKey || providedKey !== SECRET_API_KEY) {
@@ -14,6 +20,7 @@ const apiKeyAuth = (req, res, next) => {
     next();
 };
 
+// Scrape endpoint
 app.get('/scrape', apiKeyAuth, async (req, res) => {
     let { url } = req.query;
     if (!url) return res.status(400).json({ error: 'URL query parameter is required.' });
@@ -32,7 +39,11 @@ app.get('/scrape', apiKeyAuth, async (req, res) => {
 
     let browser;
     try {
-        browser = await puppeteer.launch({ headless: "new" });
+        browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+
         const page = await browser.newPage();
         await page.setUserAgent('Mozilla/5.0');
 
