@@ -40,9 +40,12 @@ app.get('/scrape', apiKeyAuth, async (req, res) => {
     let browser;
     try {
         browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
-        });
+    headless: "new",
+    executablePath: process.env.CHROMIUM_PATH, // <- use system Chromium
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+});
+
+       
 
         const page = await browser.newPage();
         await page.setUserAgent('Mozilla/5.0');
