@@ -44,12 +44,9 @@ app.get('/scrape', apiKeyAuth, async (req, res) => {
 
     let browser;
     try {
-        const browserFetcher = puppeteer.createBrowserFetcher();
-        const revisionInfo = await browserFetcher.download('1210125'); // Chromium revision for v121
 
         browser = await puppeteer.launch({
             headless: 'new',
-            executablePath: revisionInfo.executablePath,
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
 
