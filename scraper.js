@@ -39,13 +39,15 @@ app.get('/scrape', apiKeyAuth, async (req, res) => {
 
     let browser;
     try {
-        browser = await puppeteer.launch({
-    headless: "new",
-    executablePath: process.env.CHROMIUM_PATH, // <- use system Chromium
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-});
+        // ✅ Runtime Chromium download
+        const browserFetcher = puppeteer.createBrowserFetcher();
+        const revisionInfo = await browserFetcher.download('121.0.6167.85'); // ensure Puppeteer version supports this
 
-       
+        browser = await puppeteer.launch({
+            headless: 'new',
+            executablePath: revisionInfo.executablePath,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
 
         const page = await browser.newPage();
         await page.setUserAgent('Mozilla/5.0');
@@ -69,7 +71,7 @@ app.get('/scrape', apiKeyAuth, async (req, res) => {
                         if (linkObj.hostname === domain && !visitedPages.has(linkObj.href)) {
                             pagesToVisit.add(linkObj.href);
                         }
-                    } catch {}
+                    } catch { }
                 });
             } catch (err) {
                 allPagesData.push({ url: currentUrl, html: `Error: ${err.message}` });
