@@ -11,5 +11,10 @@ sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main
 apt-get update
 apt-get install -y google-chrome-stable
 
+# ✅ Copy Chrome binary to a path Render allows
+mkdir -p /opt/render/project/.apt/usr/bin
+cp -r /usr/bin/google-chrome /opt/render/project/.apt/usr/bin/google-chrome
+
 # Install node modules
 npm install
+
