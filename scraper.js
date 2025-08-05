@@ -1,5 +1,5 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 const { URL } = require('url');
 
 const app = express();
@@ -42,50 +42,50 @@ app.get('/scrape', apiKeyAuth, async (req, res) => {
     const allPagesData = [];
     const MAX_PAGES = 20;
 
-    let browser;
-    try {
-        browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            executablePath: puppeteer.executablePath()
-        });
+   let browser;
+try {
+    browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        executablePath: '/usr/bin/google-chrome'  // 🔧 Updated for puppeteer-core
+    });
 
-        const page = await browser.newPage();
-        await page.setUserAgent('Mozilla/5.0');
+    const page = await browser.newPage();
+    await page.setUserAgent('Mozilla/5.0');
 
-        while (pagesToVisit.size > 0 && visitedPages.size < MAX_PAGES) {
-            const currentUrl = pagesToVisit.values().next().value;
-            pagesToVisit.delete(currentUrl);
+    while (pagesToVisit.size > 0 && visitedPages.size < MAX_PAGES) {
+        const currentUrl = pagesToVisit.values().next().value;
+        pagesToVisit.delete(currentUrl);
 
-            if (visitedPages.has(currentUrl)) continue;
-            visitedPages.add(currentUrl);
+        if (visitedPages.has(currentUrl)) continue;
+        visitedPages.add(currentUrl);
 
-            try {
-                await page.goto(currentUrl, { waitUntil: 'networkidle2', timeout: 60000 });
-                const content = await page.content();
-                allPagesData.push({ url: currentUrl, html: content });
+        try {
+            await page.goto(currentUrl, { waitUntil: 'networkidle2', timeout: 60000 });
+            const content = await page.content();
+            allPagesData.push({ url: currentUrl, html: content });
 
-                const links = await page.$$eval('a', as => as.map(a => a.href));
-                links.forEach(link => {
-                    try {
-                        const linkObj = new URL(link, url);
-                        if (linkObj.hostname === domain && !visitedPages.has(linkObj.href)) {
-                            pagesToVisit.add(linkObj.href);
-                        }
-                    } catch { }
-                });
-            } catch (err) {
-                allPagesData.push({ url: currentUrl, html: `Error: ${err.message}` });
-            }
+            const links = await page.$$eval('a', as => as.map(a => a.href));
+            links.forEach(link => {
+                try {
+                    const linkObj = new URL(link, url);
+                    if (linkObj.hostname === domain && !visitedPages.has(linkObj.href)) {
+                        pagesToVisit.add(linkObj.href);
+                    }
+                } catch { }
+            });
+        } catch (err) {
+            allPagesData.push({ url: currentUrl, html: `Error: ${err.message}` });
         }
-
-        res.status(200).json(allPagesData);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to crawl.', details: error.message });
-    } finally {
-        if (browser) await browser.close();
     }
-});
+
+    res.status(200).json(allPagesData);
+} catch (error) {
+    res.status(500).json({ error: 'Failed to crawl.', details: error.message });
+} finally {
+    if (browser) await browser.close();
+}
+);
 
 app.listen(PORT, () => {
     console.log(`API running at http://localhost:${PORT}`);
