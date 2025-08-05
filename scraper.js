@@ -85,7 +85,6 @@ try {
 } finally {
     if (browser) await browser.close();
 }
-);
 
 app.listen(PORT, () => {
     console.log(`API running at http://localhost:${PORT}`);
