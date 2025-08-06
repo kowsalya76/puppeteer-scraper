@@ -47,7 +47,7 @@ app.get('/scrape', apiKeyAuth , async (req, res) => {
         browser = await puppeteer.launch({
             headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            executablePath: '/opt/render/project/.apt/usr/bin/google-chrome' // must match installed Chrome path in Render
+           
         });
 
         const page = await browser.newPage();
