@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
 });
 
 // Scrape route
-app.get('/scrape', async (req, res) => {
+app.get('/scrape', apiKeyAuth , async (req, res) => {
     let { url } = req.query;
     if (!url) return res.status(400).json({ error: 'URL query parameter is required.' });
 
