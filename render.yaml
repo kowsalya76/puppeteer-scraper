@@ -1,9 +1,11 @@
 services:
   - type: web
     name: puppeteer-api
-    env: docker
+    env: node
     region: oregon
     plan: free
+    buildCommand: npm install
+    startCommand: node scraper.js
     envVars:
       - key: API_KEY
         value: "mySuperSecretKey123"
