@@ -1,17 +1,19 @@
+// scraper.js
+
 const express = require('express');
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer-core'); // or 'puppeteer' if you want bundled Chromium
 const { URL } = require('url');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080; // ✅ Railway uses port 8080
 const SECRET_API_KEY = process.env.API_KEY || "mySuperSecretKey123";
 
-// Health check route
+// Health check
 app.get('/healthz', (req, res) => {
     res.status(200).send('OK');
 });
 
-// API key middleware
+// API Key Middleware
 const apiKeyAuth = (req, res, next) => {
     const providedKey = req.header('x-api-key');
     if (!providedKey || providedKey !== SECRET_API_KEY) {
@@ -20,13 +22,13 @@ const apiKeyAuth = (req, res, next) => {
     next();
 };
 
-// Welcome route
+// Default route
 app.get('/', (req, res) => {
-    res.send('Welcome to the Puppeteer Scraper API! Use /scrape or /healthz endpoints.');
+    res.send('Welcome to the Puppeteer Scraper API! Use /scrape or /healthz.');
 });
 
 // Scrape route
-app.get('/scrape', apiKeyAuth , async (req, res) => {
+app.get('/scrape', apiKeyAuth, async (req, res) => {
     let { url } = req.query;
     if (!url) return res.status(400).json({ error: 'URL query parameter is required.' });
 
@@ -46,8 +48,7 @@ app.get('/scrape', apiKeyAuth , async (req, res) => {
     try {
         browser = await puppeteer.launch({
             headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-           
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
 
         const page = await browser.newPage();
@@ -87,7 +88,7 @@ app.get('/scrape', apiKeyAuth , async (req, res) => {
     }
 });
 
-// ✅ Properly placed outside any routes
 app.listen(PORT, () => {
     console.log(`API running at http://localhost:${PORT}`);
 });
+
