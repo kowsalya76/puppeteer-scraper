@@ -21,6 +21,8 @@ const apiKeyAuth = (req, res, next) => {
     }
     next();
 };
+console.log('Provided Key:', req.header('x-api-key'));
+console.log('Expected Key:', SECRET_API_KEY);
 
 // Default route
 app.get('/', (req, res) => {
