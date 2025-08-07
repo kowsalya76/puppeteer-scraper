@@ -1,6 +1,6 @@
 FROM node:18-slim
 
-# Install dependencies
+# Install system dependencies including CA certs BEFORE anything else
 RUN apt-get update && apt-get install -y \
     wget \
     ca-certificates \
@@ -28,16 +28,16 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
     dpkg -i google-chrome-stable_current_amd64.deb || apt-get -fy install && \
     rm google-chrome-stable_current_amd64.deb
 
-# Create app directory
-WORKDIR /usr/src/app
+# Set working directory
+WORKDIR /app
 
-# Install app dependencies
+# Copy package.json and install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Bundle app source
+# Copy the rest of the application
 COPY . .
 
-# Expose and start
-EXPOSE 3000
+# Start the app
 CMD ["node", "scraper.js"]
+
