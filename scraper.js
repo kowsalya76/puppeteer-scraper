@@ -16,13 +16,18 @@ app.get('/healthz', (req, res) => {
 // API Key Middleware
 const apiKeyAuth = (req, res, next) => {
     const providedKey = req.header('x-api-key');
-    if (!providedKey || providedKey !== SECRET_API_KEY) {
+    const expectedKey = process.env.API_KEY;
+
+    // 🔍 Debug logs — check Railway logs after request
+    console.log('Provided Key:', providedKey);
+    console.log('Expected Key:', expectedKey);
+
+    if (!providedKey || providedKey !== expectedKey) {
         return res.status(401).json({ error: 'Unauthorized: Missing or invalid API key.' });
     }
+
     next();
 };
-console.log('Provided Key:', req.header('x-api-key'));
-console.log('Expected Key:', SECRET_API_KEY);
 
 // Default route
 app.get('/', (req, res) => {
